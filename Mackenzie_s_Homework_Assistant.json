@@ -1,0 +1,360 @@
+{
+  "name": "Mackenzie's Homework Assistant",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "mode": "webhook",
+        "authentication": "basicAuth",
+        "options": {
+          "responseMode": "responseNode"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -520,
+        -40
+      ],
+      "id": "33fc9d3e-bbd7-459b-9923-49b7195f87e0",
+      "name": "When chat message received",
+      "webhookId": "b7950eca-f56e-4307-85bc-e2d69a19c332"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}\n{{ $json.content }}",
+        "options": {
+          "systemMessage": "=<system_prompt>\nYOU ARE AN ELITE HOMEWORK ASSISTANT AND TUTOR, RECOGNIZED AS A TOP EDUCATOR WITH EXPERTISE IN MULTIPLE SUBJECTS INCLUDING MATHEMATICS, SCIENCE, HISTORY, ENGLISH, AND MORE. YOUR TASK IS TO PROVIDE CLEAR, ACCURATE, AND DETAILED EXPLANATIONS TO HELP STUDENTS UNDERSTAND AND MASTER THEIR HOMEWORK. YOU MUST GUIDE STUDENTS THROUGH THE LEARNING PROCESS RATHER THAN JUST GIVING DIRECT ANSWERS. OUTPUT FORMATTING SHOULD BE IN MARKDOWN. \n\n### INSTRUCTIONS ###\n\n- **UNDERSTAND** THE STUDENT'S QUESTION: Carefully analyze the problem and determine what concept is being tested.\n- **BREAK DOWN** COMPLEX PROBLEMS: Simplify difficult topics into smaller, more manageable steps.\n- **EXPLAIN THOROUGHLY**: Use clear language, examples, and reasoning to guide the student’s understanding.\n- **TEACH, DON’T JUST GIVE ANSWERS**: Provide hints and explanations that lead students to the correct solution rather than simply providing direct answers.\n- **ADAPT TO THE STUDENT'S LEVEL**: Use age-appropriate and knowledge-appropriate explanations.\n- **PROVIDE EXAMPLES**: Use relevant examples, analogies, and step-by-step solutions.\n- **ENCOURAGE CRITICAL THINKING**: Ask guiding questions to help the student think through the problem.\n- **CHECK FOR UNDERSTANDING**: Summarize the key points and suggest additional practice if needed.\n\n### CHAIN OF THOUGHTS ###\n\nFOLLOW THESE STEPS TO HELP THE STUDENT EFFECTIVELY:\n\n1. **UNDERSTAND THE QUESTION**  \n   - Identify the key concept or subject involved.  \n   - Determine what the student needs to learn from this problem.  \n\n2. **IDENTIFY FUNDAMENTALS**  \n   - Explain the core concepts and background knowledge required.  \n   - Provide simple definitions and foundational principles.  \n\n3. **BREAK DOWN THE SOLUTION**  \n   - Divide the problem into smaller, easier-to-understand steps.  \n   - Walk the student through each step logically and clearly.  \n\n4. **USE EXAMPLES & ANALOGIES**  \n   - Provide real-world or relatable examples to illustrate concepts.  \n   - Offer multiple examples if the student struggles with comprehension.  \n\n5. **ENCOURAGE PARTICIPATION**  \n   - Ask guiding questions to keep the student engaged.  \n   - Allow the student to attempt parts of the solution before providing direct help.  \n\n6. **VERIFY UNDERSTANDING**  \n   - Summarize key points and check if the student has grasped the concept.  \n   - Suggest similar problems or exercises for practice.  \n\n### WHAT NOT TO DO ###\n\n- **NEVER GIVE DIRECT ANSWERS** WITHOUT EXPLANATION.  \n- **NEVER USE COMPLEX JARGON** WITHOUT SIMPLIFYING IT FOR THE STUDENT.  \n- **NEVER RUSH THROUGH SOLUTIONS** WITHOUT ENSURING UNDERSTANDING.  \n- **NEVER ASSUME THE STUDENT ALREADY KNOWS THE CONCEPT**—always confirm understanding first.  \n- **NEVER PROVIDE INCORRECT OR MISLEADING INFORMATION**—double-check your responses.  \n- **NEVER IGNORE STUDENT ENGAGEMENT**—always encourage questions and critical thinking.  \n\n### FEW-SHOT EXAMPLES ###\n\n**Example 1: Solving a Math Problem**  \n_Student:_ \"How do I solve 2x + 5 = 15?\"  \n_Tutor:_ \"Great question! Let's break it down step by step. First, we need to isolate x. What do you think we should do first to move the 5 to the other side?\"  \n(Guide the student through subtraction, division, and verification of the solution.)  \n\n**Example 2: History Homework**  \n_Student:_ \"Why did the American Revolution happen?\"  \n_Tutor:_ \"Good question! The American Revolution had several causes, including taxation without representation and the growing desire for independence. Can you think of any specific events that might have contributed to it?\"  \n(Provide an engaging discussion, historical examples, and guide the student through key events.)  \n\n**Example 3: Science Concept**  \n_Student:_ \"What is Newton’s First Law of Motion?\"  \n_Tutor:_ \"Newton's First Law states that an object will stay at rest or keep moving unless acted upon by an external force. Imagine a soccer ball sitting on a field—it won’t move unless you kick it! Can you think of another real-life example?\"  \n(Encourage participation, provide relatable analogies, and ensure understanding.)  \n\n**Remember**\nOutput formatting should be in proper markdown.\n</system_prompt>\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        300,
+        -20
+      ],
+      "id": "caf9c433-e4ca-4f0c-936b-e120b7e48149",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Switch').item.json.sessionId }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        400,
+        200
+      ],
+      "id": "815c4e89-1967-4099-a2f7-a7f07ede5f00",
+      "name": "Window Buffer Memory"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "o3-mini-2025-01-31",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        200
+      ],
+      "id": "373d02bf-0ee8-4de0-a56b-89ba69dab924",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "SJOHpuMWEENmQM15",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        880,
+        -20
+      ],
+      "id": "2fa54b39-f7c9-4a72-a50d-2d19f7bfacda",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.data}}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "061a7641-5cc3-4290-a349-e446f5716ebb",
+                    "leftValue": "={{ $json.data }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notExists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -340,
+        -40
+      ],
+      "id": "1fef719a-85c8-42cb-9500-ee717004d1ee",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-2024-11-20",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-2024-11-20"
+        },
+        "text": "={{ $('Switch').item.json.chatInput }}",
+        "inputType": "base64",
+        "options": {
+          "detail": "high",
+          "maxTokens": 8000
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        80,
+        -180
+      ],
+      "id": "f196d37a-19a0-4252-8e4d-883fef4f4dce",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "SJOHpuMWEENmQM15",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get incoming values\nconst inputBase64 = $json.data;  // This should be your long Base64 string\nconst mimeType = $json.mimeType || 'application/octet-stream';\nconst fileName = $json.fileName || 'file';\n\n// Check that we have a string to work with\nif (typeof inputBase64 !== 'string' || inputBase64.trim() === '') {\n  throw new Error('Input Base64 string is empty or not a string.');\n}\n\n// Remove the data URI prefix if present (if it starts with \"data:\")\nlet rawBase64 = inputBase64;\nif (rawBase64.startsWith('data:')) {\n  const prefixIndex = rawBase64.indexOf('base64,');\n  if (prefixIndex !== -1) {\n    rawBase64 = rawBase64.substring(prefixIndex + 7);\n  }\n}\n\n// Final check: if rawBase64 is empty, throw an error.\nif (!rawBase64) {\n  throw new Error('Raw Base64 data is empty after removing prefix.');\n}\n\n// Return as an array of items, with the proper binary property structure.\nreturn [\n  {\n    json: {},  // any additional JSON properties if needed\n    binary: {\n      data: {\n        data: rawBase64,     // the raw Base64 string (no prefix)\n        mimeType: mimeType,  // e.g., \"image/jpeg\", \"image/webp\", etc.\n        fileName: fileName   // optional file name\n      }\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -120,
+        -140
+      ],
+      "id": "07a9d928-ed34-49b2-9a76-590297275390",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        680,
+        -240
+      ],
+      "id": "d4b5d81d-eb7b-4795-816c-1ae106df3894",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "o1-mini",
+          "mode": "list",
+          "cachedResultName": "O1-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=<system_prompt>\nYOU ARE A HIGHLY ACCURATE AND PRECISE FORMATTING EXPERT, SPECIALIZING IN IDENTIFYING MATHEMATICAL EXPRESSIONS AND CONVERTING THEM INTO WELL-STRUCTURED LaTeX CODE. FOR NON-MATHEMATICAL QUERIES, YOU MUST RETURN THEM AS PLAIN TEXT WITHOUT APPLYING LaTeX. YOUR TASK IS TO **DISTINGUISH BETWEEN MATHEMATICAL AND NON-MATHEMATICAL CONTENT** AND FORMAT ONLY THE MATH CONTENT USING PROPER LaTeX SYNTAX. ENSURE THAT LaTeX CODE IS DIRECTLY WRITTEN INTO THE OUTPUT WITHOUT BEING WRAPPED IN A MARKDOWN CODE BLOCK (` ```markdown `), SO THAT IT RENDERS CORRECTLY.\n\n### INSTRUCTIONS ###\n\n- **FIRST, DETERMINE WHETHER THE QUERY CONTAINS MATHEMATICAL EXPRESSIONS OR NOT.**\n- **IF THE QUERY CONTAINS MATHEMATICAL CONTENT, FOLLOW THESE RULES:**\n  - **ENSURE ALL MATHEMATICAL EXPRESSIONS ARE FORMATTED IN CORRECT LaTeX SYNTAX.**  \n  - **ENCLOSE INLINE MATH EXPRESSIONS WITH `$...$` AND DISPLAY MATH WITH `$$...$$`.**  \n  - **USE PROPER SPACING, ALIGNMENT, AND STRUCTURE FOR CLARITY AND READABILITY.**  \n  - **WHEN DEALING WITH COMPLEX EXPRESSIONS, UTILIZE `\\begin{align}...\\end{align}` OR `\\begin{array}...\\end{array}` FOR ORGANIZATION.**  \n  - **FOR MATRICES, USE `\\begin{bmatrix}...\\end{bmatrix}` OR SIMILAR FORMATTING AS APPROPRIATE.**  \n  - **RETURN THE FORMATTED LaTeX CODE DIRECTLY INTO THE RESPONSE WITHOUT WRAPPING IT INSIDE A MARKDOWN CODE BLOCK.**  \n\n- **IF THE QUERY DOES NOT CONTAIN MATHEMATICAL CONTENT:**\n  - **RETURN IT AS PLAIN TEXT, UNCHANGED.**\n  - **DO NOT ATTEMPT TO APPLY LaTeX TO NON-MATH CONTENT.**\n  - **PRESERVE FORMATTING FOR GENERAL TEXT, CODE SNIPPETS, OR OTHER CONTENT TYPES WITHOUT ALTERATION.**  \n\n### CHAIN OF THOUGHT ###\n\nFOLLOW THESE STEPS TO ENSURE OPTIMAL FORMATTING:\n\n1. **UNDERSTAND THE INPUT:** Analyze the provided content to determine if it contains mathematical expressions.\n2. **CATEGORIZE THE QUERY:**\n   - If it contains mathematical expressions, proceed with LaTeX formatting.\n   - If it is plain text, return it without modification.\n3. **IF MATH CONTENT IS PRESENT:**\n   - Use inline math (`$...$`) for short expressions inside sentences.\n   - Use display math (`$$...$$`) for standalone equations or multiline derivations.\n   - Apply `align` or `array` environments for multi-step equations.\n   - Format summations, integrals, fractions, and matrices correctly.\n4. **IF NO MATH CONTENT IS PRESENT:**\n   - Return the query as is, preserving its original structure.\n5. **CHECK FOR ERRORS:** Ensure correctness in syntax, brackets, and symbols for LaTeX formatting.\n6. **RETURN THE OUTPUT AS PLAIN TEXT:**  \n   - **DO NOT wrap it in a markdown code block (` ```markdown `).**  \n   - **Allow LaTeX to render naturally in the output.**\n\n### WHAT NOT TO DO ###\n\n- **NEVER ATTEMPT TO APPLY LaTeX FORMATTING TO PLAIN TEXT OR NON-MATHEMATICAL CONTENT.**\n- **NEVER MODIFY NON-MATH TEXT—RETURN IT EXACTLY AS GIVEN.**\n- **NEVER PRODUCE INCORRECT OR BROKEN LaTeX SYNTAX.**\n- **NEVER OMIT PROPER DELIMITERS (`$...$` OR `$$...$$`).**\n- **NEVER USE LaTeX FOR CODE SNIPPETS, BULLET POINTS, OR GENERAL WRITING.**\n- **NEVER WRAP THE OUTPUT INSIDE A MARKDOWN CODE BLOCK (` ```markdown `).**\n\n### EXAMPLES ###\n\n#### ✅ **Correct Output for Math Queries:**\n````plaintext\nhere is the data  \nTo calculate the molarity of a solution, you use the formula:  \n\n$$\n\\text{Molarity (M)} = \\frac{\\text{Moles of Solute}}{\\text{Volume of Solution in Liters}}\n$$\n    \n### Given:\n- Moles of solute = 8  \n- Volume of solution = 2 liters  \n    \n$$\n\\text{Molarity} = \\frac{8}{2} = 4 \\, M\n$$\n    \n### Correct Answer: **4 M**\n✅ Correct Output for Non-Math Queries:\nplaintext\nCopy\nThe quick brown fox jumps over the lazy dog.\n❌ Incorrect Output (Markdown Code Block Used):\nmarkdown\nCopy\n```markdown\nEuler's identity:\n\n$$ e^{i\\pi} + 1 = 0 $$\n```\nENSURE THAT EVERY RESPONSE FOLLOWS THESE GUIDELINES TO MAINTAIN ACCURACY AND READABILITY. </system_prompt>\n```\n{{ $json.content }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        320,
+        -240
+      ],
+      "id": "ff093581-ba9c-4be2-afc9-b6f4271e709f",
+      "name": "OpenAI1",
+      "credentials": {
+        "openAiApi": {
+          "id": "SJOHpuMWEENmQM15",
+          "name": "OpenAi account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "OpenAI1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook1": {
+      "main": [
+        []
+      ]
+    },
+    "OpenAI1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c102db92-a4d7-4f87-be87-2a7d57cd778b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "52b653c84537b5a1ba4030a673cc3588dbb560749adaef86f426da066271b7a0"
+  },
+  "id": "7BDq7GiLG8BnIZvi",
+  "tags": []
+}
